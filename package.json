@@ -1,0 +1,27 @@
+{
+  "name": "didcomm-js",
+  "version": "1.0.0",
+  "description": "JavaScript implementation of DIDComm encryption/decryption",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/test.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "secp256k1": "^5.0.0",
+    "elliptic": "^6.5.4"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "keywords": [
+    "didcomm",
+    "encryption",
+    "jwe",
+    "ecdh",
+    "aes-gcm"
+  ],
+  "author": "",
+  "license": "MIT"
+}
