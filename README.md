@@ -1,50 +1,79 @@
 
 
-## 🚀 Tính năng
+## Tính năng
 
 - **ECDH Key Exchange**: Tạo shared secret sử dụng secp256k1 elliptic curve
 - **AES-GCM Encryption**: Mã hóa an toàn sử dụng Web Crypto API
 - **JWE Support**: Định dạng JSON Web Encryption cho DIDComm messages
 - **Cross-platform**: Hoạt động trên Node.js và trình duyệt hiện đại
 
-## 📦 Cài đặt
+## Cài đặt
 
-# Cài đặt dependencies
 npm install
 ```
 
-## 🔧 Dependencies
+## Dependencies
 
 - `secp256k1`: Elliptic curve cryptography cho ECDH
 - `elliptic`: Hỗ trợ elliptic curve bổ sung
 - Web Crypto API: Crypto functionality có sẵn trong browser/Node.js
 
-## 📖 Hướng dẫn sử dụng
+## Hướng dẫn sử dụng
 
 ### 1. Import các function cần thiết
 
 ```javascript
 import { encrypt, decryptJWE, getFromKeys } from './index.js';
-
 ```
 
-## 📁 Cấu trúc project
+### 2. Hàm test đơn giản
+
+```javascript
+async function testEncryption() {
+  try {
+    const plaintext = "Hello, DIDComm!";
+    const receiverPublicKey = "02a1b2c3d4e5f6...";
+    const senderPrivateKey = "1234567890abcdef...";
+    
+    console.log("Testing encryption...");
+    
+    const encrypted = await encrypt(plaintext, receiverPublicKey, senderPrivateKey);
+    console.log("Encrypted:", encrypted);
+    
+    const decrypted = await decryptJWE(encrypted, senderPrivateKey, receiverPublicKey);
+    console.log("Decrypted:", decrypted);
+    
+    if (plaintext === decrypted) {
+      console.log("Test passed! Encryption/Decryption successful");
+    } else {
+      console.log("Test failed! Data mismatch");
+    }
+    
+  } catch (error) {
+    console.error("Test error:", error);
+  }
+}
+
+testEncryption();
+```
+
+## Cấu trúc project
 
 ```
-├── index.js          # Main entry point - export tất cả functions
-├── encrypt.js        # High-level encryption function
-├── decrypt.js        # High-level decryption function  
-├── ecdh.js          # ECDH key exchange implementation
+├── index.js
+├── encrypt.js
+├── decrypt.js  
+├── ecdh.js
 ├── crypto/
-│   └── aes.js       # AES-GCM encryption/decryption với Web Crypto API
+│   └── aes.js
 ├── jwe/
-│   └── jwe.js       # JWE structure handling và base64url encoding
-├── example.js       # Usage example với demo flow
-├── package.json     # Dependencies và scripts
-└── README.md       # Documentation này
+│   └── jwe.js
+├── example.js
+├── package.json
+└── README.md
 ```
 
-## 🔄 Luồng xử lý
+## Luồng xử lý
 
 ```
 1. Keys Input
