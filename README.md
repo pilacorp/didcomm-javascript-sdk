@@ -37,10 +37,10 @@ async function main() {
     const sharedSecret = await getFromKeys(senderPublicKey, receiverPrivateKey);
     console.log("Recipient derived:", createHash('sha256').update(sharedSecret).digest('hex'));
 
-    const jweOutput = await encrypt(message, receiverPublicKey, senderPrivateKey);
+    const jweOutput = await encrypt(sharedSecret, message);
     console.log("JWE Output:", jweOutput);
 
-    const plaintext = await decryptJWE(jweOutput, senderPrivateKey, receiverPublicKey);
+    const plaintext = await decryptJWE(jweOutput, sharedSecret);
     console.log("Plaintext:", plaintext);
 }
 
@@ -49,9 +49,9 @@ main();
 
 ## <a name="didcomm-api"></a>API
 
-- `getFromKeys(senderPub, receiverPriv) Promise<Uint8Array>`: Derives a shared secret from the sender's public and recipient's private keys.
-- `encrypt(message, receiverPublicKey, senderPrivateKey) Promise<string>`: Encrypts a message using the keys and returns a JWE string.
-- `decryptJWE(jwe, senderPrivateKey, receiverPublicKey) Promise<string>`: Decrypts a JWE string using the keys and returns the plaintext message.
+- `getFromKeys(senderPublicKey, receiverPrivateKey) Promise<Uint8Array>`: Derives a shared secret from the sender's public and recipient's private keys.
+- `encrypt(sharedSecret, message) Promise<string>`: Encrypts a message using the shared secret and returns a JWE string.
+- `decryptJWE(jwe, sharedSecret) Promise<string>`: Decrypts a JWE string using the shared secret and returns the plaintext message.
 
 **Notes:**
 
