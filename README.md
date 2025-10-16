@@ -1,101 +1,62 @@
+# DIDComm Package
 
+## <a name="didcomm-features"></a>Features
 
-## Tính năng
+- Key derivation from sender public and recipient private keys
+- Encryption of messages using a shared secret
+- Decryption of JWE messages
 
-- **ECDH Key Exchange**: Tạo shared secret sử dụng secp256k1 elliptic curve
-- **AES-GCM Encryption**: Mã hóa an toàn sử dụng Web Crypto API
-- **JWE Support**: Định dạng JSON Web Encryption cho DIDComm messages
-- **Cross-platform**: Hoạt động trên Node.js và trình duyệt hiện đại
-
-## Cài đặt
-
-npm install
-```
-
-## Dependencies
-
-- `secp256k1`: Elliptic curve cryptography cho ECDH
-- `elliptic`: Hỗ trợ elliptic curve bổ sung
-- Web Crypto API: Crypto functionality có sẵn trong browser/Node.js
-
-## Hướng dẫn sử dụng
-
-### 1. Import các function cần thiết
+## <a name="didcomm-usage"></a>Usage Example
 
 ```javascript
 import { encrypt, decryptJWE, getFromKeys } from './index.js';
-```
+import { createHash } from 'crypto';
 
-### 2. Hàm test đơn giản
+async function main() {
+    const message = `{
+        "@context": [...],
+        "id": "urn:uuid:...",
+        "type": ["VerifiableCredential"],
+        "issuer": "did:example:123456",
+        "issuanceDate": "...",
+        "credentialSubject": { ... },
+        "proof": {
+            "type": "Ed25519Signature2020",
+            "created": "...",
+            "verificationMethod": "did:example:123456#key-1",
+            "proofPurpose": "assertionMethod",
+            "jws": "..."
+        }
+    }`;
 
-```javascript
-async function testEncryption() {
-  try {
-    const plaintext = "Hello, DIDComm!";
-    const receiverPublicKey = "02a1b2c3d4e5f6...";
+    const senderPublicKey = "02a1b2c3d4e5f6...";
     const senderPrivateKey = "1234567890abcdef...";
-    
-    console.log("Testing encryption...");
-    
-    const encrypted = await encrypt(plaintext, receiverPublicKey, senderPrivateKey);
-    console.log("Encrypted:", encrypted);
-    
-    const decrypted = await decryptJWE(encrypted, senderPrivateKey, receiverPublicKey);
-    console.log("Decrypted:", decrypted);
-    
-    if (plaintext === decrypted) {
-      console.log("Test passed! Encryption/Decryption successful");
-    } else {
-      console.log("Test failed! Data mismatch");
-    }
-    
-  } catch (error) {
-    console.error("Test error:", error);
-  }
+    const receiverPublicKey = "02a1b2c3d4e5f6...";
+    const receiverPrivateKey = "1234567890abcdef...";
+
+    const sharedSecret = await getFromKeys(senderPublicKey, receiverPrivateKey);
+    console.log("Recipient derived:", createHash('sha256').update(sharedSecret).digest('hex'));
+
+    const jweOutput = await encrypt(message, receiverPublicKey, senderPrivateKey);
+    console.log("JWE Output:", jweOutput);
+
+    const plaintext = await decryptJWE(jweOutput, senderPrivateKey, receiverPublicKey);
+    console.log("Plaintext:", plaintext);
 }
 
-testEncryption();
+main();
 ```
 
-## Cấu trúc project
+## <a name="didcomm-api"></a>API
 
-```
-├── index.js
-├── encrypt.js
-├── decrypt.js  
-├── ecdh.js
-├── crypto/
-│   └── aes.js
-├── jwe/
-│   └── jwe.js
-├── example.js
-├── package.json
-└── README.md
-```
+- `getFromKeys(senderPub, receiverPriv) Promise<Uint8Array>`: Derives a shared secret from the sender's public and recipient's private keys.
+- `encrypt(message, receiverPublicKey, senderPrivateKey) Promise<string>`: Encrypts a message using the keys and returns a JWE string.
+- `decryptJWE(jwe, senderPrivateKey, receiverPublicKey) Promise<string>`: Decrypts a JWE string using the keys and returns the plaintext message.
 
-## Luồng xử lý
+**Notes:**
 
-```
-1. Keys Input
-   ├── ReceiverPublicKey (hex string)
-   └── SenderPrivateKey (hex string)
-   
-2. ECDH Key Exchange
-   └── Generate Shared Secret (32 bytes)
-   
-3. Encryption
-   ├── Plaintext → AES-GCM Encrypt
-   └── Build JWE Structure
-   
-4. Decryption
-   ├── Parse JWE Structure
-   ├── AES-GCM Decrypt
-   └── Return Plaintext
-   
-5. Verification
-   └── Compare Original vs Decrypted
-```
+- Replace `senderPublicKey`, `senderPrivateKey`, `receiverPublicKey`, and `receiverPrivateKey` with your actual key variables.
+- The package assumes you are familiar with DIDComm and JWE standards.
+- All functions are async and return Promises.
 
-
-
-
+---
