@@ -8,7 +8,7 @@
 
 ## <a name="didcomm-usage"></a>Usage Example
 
-### Sender (Encrypt)
+### Sender (Encrypt) - Người gửi
 
 ```javascript
 import { encrypt, getFromKeys } from './index.js';
@@ -31,47 +31,45 @@ async function senderExample() {
         }
     }`;
 
-    // Sender's keys
-    const senderPublicKey = "02a1b2c3d4e5f6...";
-    const senderPrivateKey = "1234567890abcdef...";
+    // Sender lấy private key của mình
+    const senderPrivateKey = "1234567890abcdef..."; // Sender's private key
     
-    // Receiver's public key (known to sender)
-    const receiverPublicKey = "02a1b2c3d4e5f6...";
+    // Sender biết public key của receiver
+    const receiverPublicKey = "02a1b2c3d4e5f6..."; // Receiver's public key
 
-    // Create shared secret using sender's private key and receiver's public key
+    // Sender tạo shared secret: dùng private key của mình + public key của receiver
     const sharedSecret = await getFromKeys(senderPrivateKey, receiverPublicKey);
     console.log("Shared secret derived:", createHash('sha256').update(sharedSecret).digest('hex'));
 
-    // Encrypt message
+    // Sender mã hóa message
     const jweOutput = await encrypt(sharedSecret, message);
     console.log("JWE Output:", jweOutput);
     
-    // Send jweOutput to receiver
+    // Sender gửi jweOutput cho receiver
 }
 
 senderExample();
 ```
 
-### Receiver (Decrypt)
+### Receiver (Decrypt) - Người nhận
 
 ```javascript
 import { decryptJWE, getFromKeys } from './index.js';
 
 async function receiverExample() {
-    // Received JWE from sender
+    // Receiver nhận JWE từ sender
     const jweOutput = "eyJhbGciOiJFQ0RILUVTK0dDTSIsImVuYyI6IkdDTSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6InNlY3AyNTZrMSIsIngiOiI...";
     
-    // Receiver's keys
-    const receiverPrivateKey = "1234567890abcdef...";
-    const receiverPublicKey = "02a1b2c3d4e5f6...";
+    // Receiver lấy private key của mình
+    const receiverPrivateKey = "abcdef1234567890..."; // Receiver's private key
     
-    // Sender's public key (known to receiver)
-    const senderPublicKey = "02a1b2c3d4e5f6...";
+    // Receiver biết public key của sender
+    const senderPublicKey = "02a1b2c3d4e5f6..."; // Sender's public key
 
-    // Create shared secret using receiver's private key and sender's public key
+    // Receiver tạo shared secret: dùng private key của mình + public key của sender
     const sharedSecret = await getFromKeys(receiverPrivateKey, senderPublicKey);
     
-    // Decrypt message
+    // Receiver giải mã message
     const plaintext = await decryptJWE(jweOutput, sharedSecret);
     console.log("Decrypted message:", plaintext);
 }
