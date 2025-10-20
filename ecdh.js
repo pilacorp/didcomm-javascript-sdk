@@ -1,5 +1,5 @@
 // ecdh.js - JavaScript implementation of ECDH key exchange
-import secp256k1 from 'secp256k1';
+import { createECDH } from 'crypto';
 
 /**
  * Generate shared secret from sender's public key and receiver's private key
@@ -13,16 +13,10 @@ export async function getFromKeys(senderPubHex, receiverPrivHex) {
         const senderPubBytes = hexToBytes(senderPubHex);
         const receiverPrivBytes = hexToBytes(receiverPrivHex);
 
-        // Parse public key - secp256k1 expects compressed format
-        const senderPubKey = senderPubBytes;
-        
-        // Create private key object
-        const receiverPrivKey = receiverPrivBytes;
-
-        // Generate shared secret using ECDH
-        const sharedSecret = secp256k1.ecdh(senderPubKey, receiverPrivKey);
-        
-        // Ensure we return a proper Uint8Array
+        // Use Node's ECDH to derive raw shared secret (X coordinate)
+        const ecdh = createECDH('secp256k1');
+        ecdh.setPrivateKey(Buffer.from(receiverPrivBytes));
+        const sharedSecret = ecdh.computeSecret(Buffer.from(senderPubBytes));
         return new Uint8Array(sharedSecret);
     } catch (error) {
         throw new Error(`ECDH key exchange failed: ${error.message}`);
