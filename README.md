@@ -38,7 +38,7 @@ async function senderExample() {
     const receiverPublicKey = "02a1b2c3d4e5f6..."; // Receiver's public key
 
     // Sender tạo shared secret: dùng private key của mình + public key của receiver
-    const sharedSecret = await getFromKeys(senderPrivateKey, receiverPublicKey);
+    const sharedSecret = await getFromKeys(receiverPublicKey,senderPrivateKey);
     console.log("Shared secret derived:", createHash('sha256').update(sharedSecret).digest('hex'));
 
     // Sender mã hóa message
@@ -67,7 +67,7 @@ async function receiverExample() {
     const senderPublicKey = "02a1b2c3d4e5f6..."; // Sender's public key
 
     // Receiver tạo shared secret: dùng private key của mình + public key của sender
-    const sharedSecret = await getFromKeys(receiverPrivateKey, senderPublicKey);
+    const sharedSecret = await getFromKeys(senderPublicKey, receiverPrivateKey);
     
     // Receiver giải mã message
     const plaintext = await decryptJWE(jweOutput, sharedSecret);

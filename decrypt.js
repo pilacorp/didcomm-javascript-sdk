@@ -24,7 +24,7 @@ export async function decryptJWE(jweStr, sharedKey) {
     try {
         // Parse JWE JSON
         const jweData = JSON.parse(jweStr);
-        const jwe = new JWE(jweData.protected, jweData.iv, jweData.ciphertext, jweData.tag);
+        const jwe = new JWE(jweData.protected, jweData.iv, jweData.ciphertext);
 
         // Decode base64url encoded components
         const iv = base64urlDecode(jwe.iv);
